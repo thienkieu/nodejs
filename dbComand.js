@@ -22,7 +22,6 @@ class dbCommand {
             db.close();
         }
 
-        
         return chanel;
     }
 }

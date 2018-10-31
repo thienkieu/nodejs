@@ -35,6 +35,11 @@ QueryBuilder.prototype.find = function(params){
     return this;
 }
 
+QueryBuilder.prototype.toArray = function(){
+    this.queue.push({F: 'toArray'});
+    return this;
+}
+
 QueryBuilder.prototype.sort = function(params){
     this.queue.push({F: 'sort', Params: params});
     return this;

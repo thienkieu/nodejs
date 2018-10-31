@@ -59,15 +59,14 @@ app.get('/search/:name', async function(req, res) {
         name: req.params.name,
     };
 
-    const deleteCommand = queryBuilderInstancee.selectCollection('customers').find(query);
+    const deleteCommand = queryBuilderInstancee.selectCollection('customers').find(query).toArray();
     
     setTimeout(async function(){
         const command = new dbCommand(dbconfig);
         const result = await command.execute(deleteCommand);
         console.log('myFirst after await');
-        console.log(result.toArray());
         res.write('<h1> Finished delete request:' + dt.myDateTime() + '</h1>');
-        res.write(result.result.n + ' document(s) deleted');
+        res.write(JSON.stringify(result) + ' document(s) deleted');
         console.log(result);
         res.end('End');
     }, 500);
