@@ -1,7 +1,6 @@
 const mongodbImplement = require('./mongodb');
 class QueryBuilder{
-    constructor(url){
-        this.url = url;
+    constructor(){
         this.queue= [];
     }
 }

@@ -8,28 +8,71 @@ const dbCommand = require('./dbComand').default;
 const app = express();
 const port = 8080;
 
-app.get('/', function(req, res) {
-    console.log(QueryBuilder);
-    const queryBuilderInstancee = new QueryBuilder(dbconfig);
+app.get('/add/:name/:address', async function(req, res) {
+    const queryBuilderInstancee = new QueryBuilder();
 
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('The date and time are currently:' + dt.myDateTime());
-    setTimeout(function(){
-        const result = queryBuilderInstancee.selectCollection('customers').insertOne({name: 'Thien', address: 'Nui thanh'});
-        console.log(result);
-        console.log(await result.excute());
-        res.end('Hellow World!');
-        console.log('after timeout');
-    }.bind(this), 5000);
+    
+    const data = {
+        name: req.params.name,
+        address: req.params.address,
+    };
+
+    const queryBuilder = queryBuilderInstancee.selectCollection('customers').insertOne(data);
+
+    setTimeout(async function(){
+        const command = new dbCommand(dbconfig);
+        const result = await command.execute(queryBuilderInstancee);
+        console.log(result.insertedCount);
+    }, 500);
+    
+    res.end('Hellow World!');
+    console.log('after timeout');
+   
 });
 
-app.get('/insertRecord', async function(req, res) {
-    const i = await dbInstance.mongodbImplement;
+app.get('/delete', async function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<h1>Recieve delete request:' + dt.myDateTime() + '</h1>');
 
-    i.insertRecord(function(){
-        res.end('insert 1 record');
-    });
+    const queryBuilderInstancee = new QueryBuilder();
+    const deleteCommand = queryBuilderInstancee.selectCollection('customers').deleteMany({name: 'Thien'});
     
+    setTimeout(async function(){
+        const command = new dbCommand(dbconfig);
+        const result = await command.execute(deleteCommand);
+        res.write('<h1> Finished delete request:' + dt.myDateTime() + '</h1>');
+        res.write(result.result.n + ' document(s) deleted');
+        res.end('End');
+    }, 500);
+
+    res.write('<p>Waiting result</p>');
+});
+
+app.get('/search/:name', async function(req, res) {
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write('<h1>Recieve delete request:' + dt.myDateTime() + '</h1>');
+
+    const queryBuilderInstancee = new QueryBuilder();
+    const query = {
+        name: req.params.name,
+    };
+
+    const deleteCommand = queryBuilderInstancee.selectCollection('customers').find(query);
+    
+    setTimeout(async function(){
+        const command = new dbCommand(dbconfig);
+        const result = await command.execute(deleteCommand);
+        console.log('myFirst after await');
+        console.log(result.toArray());
+        res.write('<h1> Finished delete request:' + dt.myDateTime() + '</h1>');
+        res.write(result.result.n + ' document(s) deleted');
+        console.log(result);
+        res.end('End');
+    }, 500);
+
+    res.write('<p>Waiting result</p>');
 });
 
 app.listen(port);
