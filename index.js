@@ -8,12 +8,16 @@ const dbCommand = require('./dbComand').default;
 const app = express();
 const port = 8080;
 
+app.post('/user/signup', async function(req, res){
+
+});
+
 app.get('/add/:name/:address', async function(req, res) {
     const queryBuilderInstancee = new QueryBuilder();
 
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('The date and time are currently:' + dt.myDateTime());
-    
+
     const data = {
         name: req.params.name,
         address: req.params.address,
@@ -26,10 +30,10 @@ app.get('/add/:name/:address', async function(req, res) {
         const result = await command.execute(queryBuilderInstancee);
         console.log(result.insertedCount);
     }, 500);
-    
+
     res.end('Hellow World!');
     console.log('after timeout');
-   
+
 });
 
 app.get('/delete', async function(req, res) {
@@ -38,7 +42,7 @@ app.get('/delete', async function(req, res) {
 
     const queryBuilderInstancee = new QueryBuilder();
     const deleteCommand = queryBuilderInstancee.selectCollection('customers').deleteMany({name: 'Thien'});
-    
+
     setTimeout(async function(){
         const command = new dbCommand(dbconfig);
         const result = await command.execute(deleteCommand);
@@ -60,7 +64,7 @@ app.get('/search/:name', async function(req, res) {
     };
 
     const deleteCommand = queryBuilderInstancee.selectCollection('customers').find(query).toArray();
-    
+
     setTimeout(async function(){
         const command = new dbCommand(dbconfig);
         const result = await command.execute(deleteCommand);
