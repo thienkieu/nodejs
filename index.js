@@ -4,12 +4,69 @@ const dt = require('./myFirstModule');
 const dbconfig = 'mongodb://thienkieu:Mlab0958588127@ds243963.mlab.com:43963/thienkieu';
 const QueryBuilder = require('./queryBuilder').default;
 const dbCommand = require('./dbComand').default;
+const bodyParser = require('body-parser');
+const fs   = require('fs');
+const jwt  = require('jsonwebtoken');
+const multer  = require('multer');
 
 const app = express();
 const port = 8080;
 
-app.post('/user/signup', async function(req, res){
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(multer());
 
+app.get('/', function(req, res) {
+    res.end('Hello');
+});
+
+app.post('/user', function(req, res) {
+    const verifyOptions = {
+        expiresIn:  "12h",
+        algorithm:  ["RS256"]
+    };
+
+    token = req.headers.token;
+
+    const publicKEY  = fs.readFileSync('./public.key', 'utf8');
+    let isValid = false;
+    try{
+        const legit = jwt.verify(token, publicKEY, verifyOptions);
+        isValid = true;
+        console.log(legit);
+        res.write('ok');
+    } catch(ex) {
+        console.log(ex);
+    }
+
+
+    res.end('done');
+});
+
+app.post('/token', async function(req, res){
+    const identity = req.body.identity;
+    const password = req.body.password;
+
+    if (!identity || ! password) {
+        res.json({
+            isError: true,
+            message: 'password or user is not correct',
+        });
+    }
+
+    const privateKEY  = fs.readFileSync('./private.key', 'utf8');
+
+    const payload = {
+        email: identity,
+    };
+
+    const signOptions = {
+        expiresIn:  "12h",
+        algorithm:  "RS256"
+    };
+
+    var token = jwt.sign(payload, privateKEY, signOptions);
+    res.end(token);
 });
 
 app.get('/add/:name/:address', async function(req, res) {
