@@ -1,7 +1,7 @@
 import SignupPolicies from './policies';
 import StoreInfo from './storeInfo';
 
-function signup(signupCandidate) {
+function signupDomain(signupCandidate) {
     const isPassPolicies = SignupPolicies.isExisted(signupCandidate) && SignupPolicies.isAcceptTermCondition(signupCandidate);
     if (isPassPolicies) {
         return StoreInfo(signupCandidate);
@@ -14,5 +14,5 @@ function signup(signupCandidate) {
     return ret;
 }
 
-export default signup;
+export default signupDomain;
 

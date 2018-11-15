@@ -8,6 +8,7 @@ const bodyParser = require('body-parser');
 const fs   = require('fs');
 const jwt  = require('jsonwebtoken');
 const multer  = require('multer');
+const tokenGenerator = require('./webApi/user/token');
 
 const app = express();
 const port = 8080;
@@ -16,58 +17,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 //app.use(multer());
 
+const router = app.Router();
+
+
 app.get('/', function(req, res) {
     res.end('Hello');
 });
 
-app.post('/user', function(req, res) {
-    const verifyOptions = {
-        expiresIn:  "12h",
-        algorithm:  ["RS256"]
-    };
+app.post('/token', tokenGenerator);
 
-    token = req.headers.token;
-
-    const publicKEY  = fs.readFileSync('./public.key', 'utf8');
-    let isValid = false;
-    try{
-        const legit = jwt.verify(token, publicKEY, verifyOptions);
-        isValid = true;
-        console.log(legit);
-        res.write('ok');
-    } catch(ex) {
-        console.log(ex);
-    }
-
-
-    res.end('done');
-});
-
-app.post('/token', async function(req, res){
-    const identity = req.body.identity;
-    const password = req.body.password;
-
-    if (!identity || ! password) {
-        res.json({
-            isError: true,
-            message: 'password or user is not correct',
-        });
-    }
-
-    const privateKEY  = fs.readFileSync('./private.key', 'utf8');
-
-    const payload = {
-        email: identity,
-    };
-
-    const signOptions = {
-        expiresIn:  "12h",
-        algorithm:  "RS256"
-    };
-
-    var token = jwt.sign(payload, privateKEY, signOptions);
-    res.end(token);
-});
+import router from './webApi/user/router';
+import handleAuthorization from './webApi/user/handleAuthorization';
+app.use('/user', handleAuthorization, router);
 
 app.get('/add/:name/:address', async function(req, res) {
     const queryBuilderInstancee = new QueryBuilder();
