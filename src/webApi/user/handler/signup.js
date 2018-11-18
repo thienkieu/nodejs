@@ -1,4 +1,4 @@
-import signupDomain  from 'domain/user/signup';
+const signupDomain = require('domain/user/signup/index');
 function signupHanlder(req, res) {
     const data = {
         name: req.body.name,
@@ -9,4 +9,4 @@ function signupHanlder(req, res) {
     res.json(result);
 }
 
-export default signupHanlder;
+module.exports = signupHanlder;

@@ -1,5 +1,5 @@
-import SignupPolicies from './policies';
-import StoreInfo from './storeInfo';
+const SignupPolicies = require('./policies');
+const StoreInfo = require('./storeInfo');
 
 function signupDomain(signupCandidate) {
     const isPassPolicies = SignupPolicies.isExisted(signupCandidate) && SignupPolicies.isAcceptTermCondition(signupCandidate);
@@ -14,5 +14,5 @@ function signupDomain(signupCandidate) {
     return ret;
 }
 
-export default signupDomain;
+exports.default = signupDomain;
 

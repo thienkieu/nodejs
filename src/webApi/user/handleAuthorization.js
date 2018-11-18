@@ -1,10 +1,15 @@
-import verifyOptions from './jwtConfig';
+import { verifyOptions } from './jwtConfig';
+import jwt from 'jsonwebtoken';
+
+let publicKey = '';
+function initPublicKey(key){
+    publicKey = key;
+}
 
 function handleAuthorization(req, res, next){
     const token = req.headers.authorization;
-    const publicKEY  = fs.readFileSync('./public.key', 'utf8');
     try{
-        const legit = jwt.verify(token, publicKEY, verifyOptions);
+        const legit = jwt.verify(token, publicKey, verifyOptions);
         req.identity = legit.identity;
         next();
     } catch(ex) {
@@ -16,3 +21,4 @@ function handleAuthorization(req, res, next){
 }
 
 export default handleAuthorization;
+export { initPublicKey }

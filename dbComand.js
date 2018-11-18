@@ -1,4 +1,4 @@
-const MongoClient = require('mongodb').MongoClient; 
+const MongoClient = require('mongodb').MongoClient;
 class dbCommand {
     constructor(url) {
         this.url = url;
@@ -13,7 +13,7 @@ class dbCommand {
                 chanel = await chanel[item.F](item.Params);
                 console.log('db-Command -- ' + item.F);
             }
-            
+
         } catch(e) {
             console.log('db-Command --exception');
             console.log(e);
@@ -26,4 +26,4 @@ class dbCommand {
     }
 }
 
-exports.default = dbCommand;
+module.exports = dbCommand;

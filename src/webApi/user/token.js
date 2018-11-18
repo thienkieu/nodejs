@@ -1,5 +1,7 @@
 import { signOptions } from './jwtConfig';
-
+import fs from 'fs';
+import jwt from 'jsonwebtoken';
+let privateKEY = '';
 function token(req, res) {
     const identity = req.body.identity;
     const password = req.body.password;
@@ -11,7 +13,9 @@ function token(req, res) {
         });
     }
 
-    const privateKEY  = fs.readFileSync('./private.key', 'utf8');
+    //const privateKEY  = fs.readFileSync('./private.key', 'utf8');
+
+
     const payload = {
         email: identity,
     };
@@ -23,4 +27,11 @@ function token(req, res) {
     });
 }
 
+function initPrivateKey(key){
+    privateKEY = key;
+}
+
 export default token;
+export {
+    initPrivateKey,
+}

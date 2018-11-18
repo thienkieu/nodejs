@@ -1,43 +1,48 @@
 const express = require('express');
-const dbCommand = require('./dbComand');
-const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const fs   = require('fs');
+
 const dt = require('./myFirstModule');
-
-import QueryBuilder from './queryBuilder';
-import handleAuthorization, { initPublicKey } from '/webApi/user/handleAuthorization';
-import tokenGenerator, { initPrivateKey } from 'webApi/user/token';
-
-const argv = require('yargs').argv
-
-let privateKey = Buffer.from(argv.privateKey, 'base64');
-initPrivateKey(privateKey.toString());
-
-let publicKey = Buffer.from(argv.publicKey, 'base64');
-initPublicKey(publicKey.toString());
-
 const dbconfig = 'mongodb://thienkieu:Mlab0958588127@ds243963.mlab.com:43963/thienkieu';
+const QueryBuilder = require('./queryBuilder').default;
+const dbCommand = require('./dbComand').default;
 
 const app = express();
 const port = 8080;
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.post('/token', function(req, res) {
+    const identity = req.body.identity;
+    const password = req.body.password;
+    if (identity === '' || password === '') {
+        res.json({
+            isError: true,
+            messages: 'identity or password in correctly',
+        });
+    }
+    const privateKey = fs.readFileSync('./private.key', 'utf8');
 
-app.get('/', function(req, res) {
-    res.end('hellow');
+    const signOptions = {
+        expiresIn: 86400, // expires in 24 hours
+        algorithm: 'RS256',
+    };
+
+    const token = jwt.sign({id: identity}, privateKey, signOptions);
+    res.json({
+        isError: false,
+        token: token,
+    });
 });
 
-app.post('/token', tokenGenerator);
-
-import userRouter from 'webApi/user/router';
-app.use('/user', handleAuthorization, userRouter);
+app.get('/', function(req, res) {
+    res.end('home page');
+});
 
 app.get('/add/:name/:address', async function(req, res) {
     const queryBuilderInstancee = new QueryBuilder();
 
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('The date and time are currently:' + dt.myDateTime());
-
+    
     const data = {
         name: req.params.name,
         address: req.params.address,
@@ -47,13 +52,10 @@ app.get('/add/:name/:address', async function(req, res) {
 
     setTimeout(async function(){
         const command = new dbCommand(dbconfig);
-        const result = await command.execute(queryBuilderInstancee);
-        console.log(result.insertedCount);
+        command.execute(queryBuilder);
     }, 500);
-
+    
     res.end('Hellow World!');
-    console.log('after timeout');
-
 });
 
 app.get('/delete', async function(req, res) {
@@ -62,7 +64,7 @@ app.get('/delete', async function(req, res) {
 
     const queryBuilderInstancee = new QueryBuilder();
     const deleteCommand = queryBuilderInstancee.selectCollection('customers').deleteMany({name: 'Thien'});
-
+    
     setTimeout(async function(){
         const command = new dbCommand(dbconfig);
         const result = await command.execute(deleteCommand);
@@ -84,7 +86,7 @@ app.get('/search/:name', async function(req, res) {
     };
 
     const deleteCommand = queryBuilderInstancee.selectCollection('customers').find(query).toArray();
-
+    
     setTimeout(async function(){
         const command = new dbCommand(dbconfig);
         const result = await command.execute(deleteCommand);

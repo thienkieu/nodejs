@@ -75,5 +75,5 @@ QueryBuilder.prototype.join = function(params){
     return this;
 }
 
-exports.default = QueryBuilder; 
+export default QueryBuilder;
 

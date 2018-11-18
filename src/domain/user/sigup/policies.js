@@ -8,4 +8,4 @@ class SignupPolicies {
     };
 }
 
-export default SignupPolicies;
+module.exports = SignupPolicies;

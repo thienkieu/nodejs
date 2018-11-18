@@ -8,7 +8,4 @@ const signOptions = {
     algorithm:  "RS256"
 };
 
-export default verifyOptions;
-export {
-    signOptions,
-}
+export { verifyOptions, signOptions }
