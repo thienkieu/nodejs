@@ -1,7 +1,8 @@
 import { signOptions } from './jwtConfig';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
-let privateKEY = '';
+import { getPrivateKey } from '../../../appConfig';
+
 function token(req, res) {
     const identity = req.body.identity;
     const password = req.body.password;
@@ -20,18 +21,11 @@ function token(req, res) {
         email: identity,
     };
 
-    const token = jwt.sign(payload, privateKEY, signOptions);
+    const token = jwt.sign(payload, getPrivateKey(), signOptions);
     res.json({
         isSuccess: true,
         token,
     });
 }
 
-function initPrivateKey(key){
-    privateKEY = key;
-}
-
 export default token;
-export {
-    initPrivateKey,
-}

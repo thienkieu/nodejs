@@ -1,13 +1,14 @@
 const express = require('express');
-const userRouter = express.Router();
+const userRouterWithAuthen = express.Router();
+const userRouterWithoutAuthen = express.Router();
 
-//const signupHanlder = require('./handler/signup');
+import signupHanlder from './handler/signup';
 //import { updateProfileHandler, getProfileHandler } from './handler/profile';
 
-userRouter.post('/profile', function(req, res){
+userRouterWithAuthen.post('/profile', function(req, res){
     res.end('ok');
 });
 //router.get('/profile', getProfileHandler);
-//router.post('/signup', signupHanlder);
+userRouterWithoutAuthen.post('/signup', signupHanlder);
 
-export default userRouter;
+export { userRouterWithAuthen, userRouterWithoutAuthen };

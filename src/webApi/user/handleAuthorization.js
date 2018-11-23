@@ -1,15 +1,11 @@
 import { verifyOptions } from './jwtConfig';
 import jwt from 'jsonwebtoken';
-
-let publicKey = '';
-function initPublicKey(key){
-    publicKey = key;
-}
+import { getPublicKey } from '../../../appConfig';
 
 function handleAuthorization(req, res, next){
     const token = req.headers.authorization;
     try{
-        const legit = jwt.verify(token, publicKey, verifyOptions);
+        const legit = jwt.verify(token, getPublicKey(), verifyOptions);
         req.identity = legit.identity;
         next();
     } catch(ex) {
@@ -21,4 +17,3 @@ function handleAuthorization(req, res, next){
 }
 
 export default handleAuthorization;
-export { initPublicKey }

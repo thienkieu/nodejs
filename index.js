@@ -2,10 +2,14 @@ const express = require('express');
 const dbCommand = require('./dbComand');
 const bodyParser = require('body-parser');
 const dt = require('./myFirstModule');
+const http = require('http');
+const socketIO = require('socket.io');
 
+import logger from 'infrastructure/logger/logger';
 import QueryBuilder from './queryBuilder';
-import handleAuthorization, { initPublicKey } from '/webApi/user/handleAuthorization';
-import tokenGenerator, { initPrivateKey } from 'webApi/user/token';
+import handleAuthorization from '/webApi/user/handleAuthorization';
+import tokenGenerator from 'webApi/user/token';
+import { initDataPrivateKey, initDataPublicKey, initPrivateKey, initPublicKey } from './appConfig';
 
 const argv = require('yargs').argv
 
@@ -14,6 +18,12 @@ initPrivateKey(privateKey.toString());
 
 let publicKey = Buffer.from(argv.publicKey, 'base64');
 initPublicKey(publicKey.toString());
+
+let privateKey1 = Buffer.from(argv.privateKey1, 'base64');
+initDataPrivateKey(privateKey1.toString());
+
+let publicKey1 = Buffer.from(argv.publicKey1, 'base64');
+initDataPublicKey(publicKey1.toString());
 
 const dbconfig = 'mongodb://thienkieu:Mlab0958588127@ds243963.mlab.com:43963/thienkieu';
 
@@ -29,9 +39,18 @@ app.get('/', function(req, res) {
 
 app.post('/token', tokenGenerator);
 
-import userRouter from 'webApi/user/router';
-app.use('/user', handleAuthorization, userRouter);
+import { userRouterWithAuthen, userRouterWithoutAuthen } from 'webApi/user/router';
+app.use('/user', handleAuthorization, userRouterWithAuthen);
+app.use('/nouser', userRouterWithoutAuthen);
 
+import { coreRouterWithAuthen, coreRouterWithoutAuthen } from 'webApi/core/router';
+app.use('/core', handleAuthorization, coreRouterWithAuthen);
+app.use('/nousercore', coreRouterWithoutAuthen);
+
+import { chatRouterWithAuthen, chatRouterWithoutAuthen } from 'webApi/chat/router';
+app.use('/chat', chatRouterWithoutAuthen);
+
+app.use('/static', express.static('./src/public'));
 app.get('/add/:name/:address', async function(req, res) {
     const queryBuilderInstancee = new QueryBuilder();
 
@@ -98,4 +117,28 @@ app.get('/search/:name', async function(req, res) {
     res.write('<p>Waiting result</p>');
 });
 
-app.listen(port);
+
+let httpServer = http.Server(app);
+let io = socketIO(httpServer);
+//app.listen(port);
+import socketHanlder from 'webSocket/socketHanlder';
+
+io.on('connection', function(socket){
+    new socketHanlder(socket);
+});
+/*io.on('connection', function(socket){
+    console.log(socket.id);
+    console.log('a user connected');
+    socket.on('disconnect', function(){
+        console.log('user disconnected');
+    });
+
+    socket.on('chat message', function(msg){
+        console.log('message: ' + msg);
+    });
+});
+*/
+
+httpServer.listen(port, function(){
+    console.log('sdfsf');
+});

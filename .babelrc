@@ -6,6 +6,8 @@
       "alias": {
         "domain": "./src/domain",
         "webApi": "./src/webApi",
+        "webSocket": "./src/webSocket",
+        "infrastructure": "./src/infrastructure",
         "underscore": "lodash"
       }
     }]

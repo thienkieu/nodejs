@@ -1,12 +1,17 @@
-const signupDomain = require('domain/user/signup/index');
-function signupHanlder(req, res) {
+import signupDomain from 'domain/user/signup';
+import SignupCandidate from 'domain/user/signup/candidate';
+
+async function signupHanlder(req, res) {
     const data = {
-        name: req.body.name,
-        address: req.body.address,
+        email: req.body.email,
+        fullname: req.body.fullname,
+        phone: req.body.phone,
+        password: req.body.password,
     };
 
-    const result = signupDomain(data);
+    const candidate = new SignupCandidate(data.email, data.password, data.fullname, data.phone);
+    const result =  await signupDomain(candidate);
     res.json(result);
 }
 
-module.exports = signupHanlder;
+export default signupHanlder;

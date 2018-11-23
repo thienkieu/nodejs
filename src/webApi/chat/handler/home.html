@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <head><link rel="stylesheet" href="/static/app.css"> </head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"> </script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="content"></div>
+            <div class="bottom"><input id="text-input" type="text"/> <button id="sent">sent</button></div>
+        </div>
+        <script>
+            var socket = io();
+            //socket.emit('authentication', localStorage.get('token'));
+            $("#sent").click(function(){
+                var message = $('#text-input').val();
+                socket.emit('chat', message);
+                $('.content').append('<div>' + message+ '</div>');
+                $('#text-input').val('');
+            });
+            socket.on('chat', function(msg){
+                $('.content').append('<div> ' + msg + '</div>');
+            });
+          </script>
+    </body>
+</html>
